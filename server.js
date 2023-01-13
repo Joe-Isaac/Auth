@@ -85,7 +85,7 @@ function authenticateToken(req, res, next){
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
         console.log("Our user is ", user)
-        console.log("This is the middleware eerrrooorrr....", err)
+        console.log("This is the middleware eerrrorr....", err)
         if(err) return res.sendStatus(403)
         
         req.user = user
