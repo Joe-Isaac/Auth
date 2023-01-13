@@ -1,12 +1,15 @@
+require("dotenv").config()
 const express = require("express")
 const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
+
 const app = express()
 
 app.use(express.json())
 
 const users = []
 
-app.get("/users", (req, res) => {
+app.get("/users", authenticateToken, (req, res) => {
     console.log("Requested user info is", users)
     res.json(users)
 })
@@ -55,7 +58,12 @@ app.post("/users/login", async (req, res) => {
 
     try{
         if(await bcrypt.compare(req.body.password, user.password)){
-            res.send("successfully logged in")
+            
+            console.log("My user is ", user.name)
+            const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
+            console.log("My token is ", accessToken)
+            
+            res.status(200).json({ accessToken : accessToken})
         }
         else{
             res.status(401).send("not allowed")
@@ -67,5 +75,22 @@ app.post("/users/login", async (req, res) => {
         res.status(500).send()
     }
 })
+
+function authenticateToken(req, res, next){
+    const authHeader = req.headers["authorization"]
+    console.log("Auth Header is ", authHeader)
+    const token = authHeader && authHeader.split(' ')[1]
+
+    if(token === null) return res.sendStatus(401)
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+        console.log("Our user is ", user)
+        console.log("This is the middleware eerrrooorrr....", err)
+        if(err) return res.sendStatus(403)
+        
+        req.user = user
+        next()
+    })
+}
 
 app.listen(9000)
