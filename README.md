@@ -1,5 +1,3 @@
-# Auth
-
 # NodeJsAuth
 Authentication with NodeJs(express), and jwt tokens
 
