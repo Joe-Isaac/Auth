@@ -7,7 +7,11 @@ const app = express()
 
 app.use(express.json())
 
-const users = []
+const users = [
+    {
+        users : "We need to find a better way to store the users, but they are now secure"
+    }
+]
 
 app.get("/users", authenticateToken, (req, res) => {
     console.log("Requested user info is", users)
